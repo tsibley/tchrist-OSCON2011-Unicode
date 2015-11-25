@@ -6,7 +6,7 @@ disappeared.
 I've downloaded the most recent versions of two of the talks from the Internet
 Archive's Wayback Machine and archived them in this repository:
 
-* Perl Unicode Essentials
-* Unicode Support Shootout: The Good, The Bad, & the (mostly) Ugly
+* [Perl Unicode Essentials](https://tsibley.github.io/tchrist-OSCON2011-Unicode/pue.html)
+* [Unicode Support Shootout: The Good, The Bad, & the (mostly) Ugly](https://tsibley.github.io/tchrist-OSCON2011-Unicode/gbu.html)
 
 archive.org's injected JS and HTML has been stripped out.
