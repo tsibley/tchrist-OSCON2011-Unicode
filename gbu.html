@@ -1,0 +1,1636 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+
+
+
+<title>Unicode: Good, Bad, & Ugly</title>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="pod2s5 0.08" />
+<meta name="generator" content="S5" />
+<meta name="version" content="S5 1.1 hacked by tchrist" />
+<meta name="presdate" content="Thursday, 28 July 2011" />
+<meta name="author" content="Tom Christiansen" />
+<meta name="company" content="&nbsp;" />
+<!-- configuration parameters -->
+<meta name="defaultView" content="slideshow" />
+<meta name="controlVis" content="hidden" />
+<!-- style sheet links -->
+<link rel="stylesheet" href="ui/default/slides.css" type="text/css" media="projection" id="slideProj" />
+<link rel="stylesheet" href="ui/default/outline.css" type="text/css" media="screen" id="outlineStyle" />
+<link rel="stylesheet" href="ui/default/print.css" type="text/css" media="print" id="slidePrint" />
+<link rel="stylesheet" href="ui/default/opera.css" type="text/css" media="projection" id="operaFix" />
+
+<!-- embedded styles -->
+<style type="text/css" media="all">
+.imgcon {width: 525px; margin: 0 auto; padding: 0; text-align: center;}
+#anim {width: 270px; height: 320px; position: relative; margin-top: 0.5em;}
+#anim img {position: absolute; top: 42px; left: 24px;}
+img#me01 {top: 0; left: 0;}
+img#me02 {left: 23px;}
+img#me04 {top: 44px;}
+img#me05 {top: 43px;left: 36px;}
+</style>
+<!-- S5 JS -->
+<script src="ui/default/slides.js" type="text/javascript"></script>
+<!--
+   tom AT cpan.org:
+   this will not work, it's not contained
+   in the downloadable S5
+   <script src="/mint/?js" type="text/javascript"></script></head>
+-->
+</head><body>
+
+
+
+
+<div class="layout">
+
+<div id="controls"></div>
+<div id="currentSlide"></div>
+<div id="header"></div>
+<div id="footer">
+<h1>OSCON &#8226; Thursday, 28 July 2011</h1>
+<h2>Unicode: Good, Bad, & Ugly</h2></div>
+</div><div class="slide">
+<h1>🔫  Unicode Support Shootout 
+
+
+</h1><p><blockquote>
+<center>
+<head3 align=center>
+        <font size="+5">
+👍  The Good, the Bad, & the <font size="+3">(mostly)</font> Ugly 👎  
+        </font>
+</head3>
+</center>
+</blockquote>
+<p align=right>‌</p>
+<h2 align=center>
+<font size="+3"> Tom Christiansen<BR> </font>
+&lt;tchrist@perl.com&gt; <p>
+<code>These slides are at <u>http://training.perl.com/OSCON2011/index.html</u></code>
+</h2>
+
+</p></div>
+<div class="slide">
+<h1>What <i>is</i> this?
+
+</h1><ul><li level="1">Get the current version of these slides in HTML, PDF, or POD from here:
+
+<pre> http://training.perl.com/OSCON2011/index.html </pre></li><li level="1">See <i>Appendix 1: Fonts</i> at the end of this talk for instructions on font set-up.
+
+</li><li level="1">These slides were written in pod using <i>vi</i>, with the help of a
+score of Unicode tools available via the link in <i>Appendix 2: Tools</i>.
+
+</li><li level="1">This slide show was built using <code>Pod::S5</code> by Tom Linden, which in
+turn uses <code>S5</code> by Eric Meyer.  Slideshow controls appears if you hover
+near the bottom right corner, but I ﬁnd it easier to use
+keystroke commands to navigate.
+
+</li><li level="1">I’ve used next to no HTML tricks here; nearly all 
+fancy‐<i>qua</i>‐weird stuﬀ you see here is actually Unicode.
+
+</li></ul></div>
+<div class="slide">
+<h1>🔎  Scope of This Talk
+
+</h1><ul><li level="1">I’ll ﬁrst motivate you by quickly showing the sorts of Unicode you now
+routinely encounter in modern, real‐world text corpora.
+
+
+</li><li level="1">Then I’ll show you a pair of charts that give high‐level summaries of
+how far each of the more popular programming languages respectively goes — or fails to 
+go — in its native, out‐of‐the‐box Unicode support.
+
+</li><li level="1">I’ll then look into each of the covered
+languages’ Unicode strengths and weaknesses.
+
+</li><li level="1">The particular languages I’ll be looking at are
+Javascript,
+PHP,
+Go,
+Python,
+Ruby,
+Java,
+and
+Perl.
+
+</li><li level="1">I’ve worked with Unicode daily for years, but
+I don’t know everything about everything.  Languages are listed in 
+increasing order of my own experience with them —
+so I may have missed stuﬀ, especially in the earlier ones.
+
+</li></ul></div>
+<div class="slide">
+<h1>The Unicode Standard
+
+</h1><ul><li level="1">Because Unicode <b>is a 📖  standard</b>, 
+get used to checking various components of <i>The Unicode Standard</i>,
+which at last glance comprised
+11 standard annexes, 8 technical standards, 
+and 10 technical reports. Here are some that stand out:
+
+<ul><li level="1">📖  UAX #44: Unicode Character Database  (includes all properties)
+
+</li><li level="1">📖  UTS #18: Unicode Regular Expressions (includes three requirement levels)
+
+</li><li level="1">📖  UAX #15: Unicode Normalization Forms  (NFD, NFC, <i>&c</i>)
+
+</li><li level="1">📖  UTS #10: Unicode Collation Algorithm  (UCA)
+
+</li><li level="1">📖  UAX #29: Unicode Text Segmentation (includes graphemes)
+
+</li><li level="1">📖  UAX #14: Unicode Line Breaking Algorithm
+
+</li><li level="1">📖  UAX #11: East Asian Width
+
+</li></ul></li><li level="1"><i>“A Unicode Technical Report (UTR) contains informative material. Conformance to the Unicode Standard does not imply conformance to any UTR. Other speciﬁcations, however, are free to make normative reference.”</i>
+
+</li></ul></div>
+<div class="slide">
+<h1>A Sample Unicode Corpus
+
+</h1><p>The PubMed Central Open Access corpus comprises around 11G of Unicode data spread across
+around 200k diﬀerent ﬁles.  Here are its most commonly occurring non‐ASCII code points:
+
+</p><font size="3">
+
+<pre>   1  18.55%  18.55%  U+02013 ‹–›  GC=Pd    EN DASH                               31   0.49%  88.28%  U+02264 ‹≤›  GC=Sm    LESS-THAN OR EQUAL TO
+   2   7.42%  25.97%  U+000A0  ⧆   GC=Zs    NO-BREAK SPACE                        32   0.44%  88.72%  U+000AE ‹®›  GC=So    REGISTERED SIGN
+   3   7.03%  33.01%  U+000B1 ‹±›  GC=Sm    PLUS-MINUS SIGN                       33   0.43%  89.15%  U+000E4 ‹ä›  GC=Ll    LATIN SMALL LETTER A WITH DIAERESIS
+   4   5.46%  38.47%  U+02212 ‹−›  GC=Sm    MINUS SIGN                            34   0.42%  89.57%  U+02020 ‹†›  GC=Po    DAGGER
+   5   4.20%  42.66%  U+02003  ⧆   GC=Zs    EM SPACE                              35   0.41%  89.98%  U+003B4 ‹δ›  GC=Ll    GREEK SMALL LETTER DELTA
+   6   3.68%  46.35%  U+003BC ‹μ›  GC=Ll    GREEK SMALL LETTER MU                 36   0.37%  90.35%  U+000E1 ‹á›  GC=Ll    LATIN SMALL LETTER A WITH ACUTE
+   7   3.62%  49.97%  U+003B2 ‹β›  GC=Ll    GREEK SMALL LETTER BETA               37   0.34%  90.69%  U+02192 ‹→›  GC=Sm    RIGHTWARDS ARROW
+   8   3.57%  53.53%  U+003B1 ‹α›  GC=Ll    GREEK SMALL LETTER ALPHA              38   0.33%  91.02%  U+000ED ‹í›  GC=Ll    LATIN SMALL LETTER I WITH ACUTE
+   9   3.43%  56.96%  U+0200A  ⧆   GC=Zs    HAIR SPACE                            39   0.31%  91.33%  U+003C3 ‹σ›  GC=Ll    GREEK SMALL LETTER SIGMA
+  10   3.22%  60.18%  U+000B0 ‹°›  GC=So    DEGREE SIGN                           40   0.30%  91.62%  U+000C5 ‹Å›  GC=Lu    LATIN CAPITAL LETTER A WITH RING ABOVE
+  11   2.93%  63.11%  U+02009  ⧆   GC=Zs    THIN SPACE                            41   0.29%  91.92%  U+003BB ‹λ›  GC=Ll    GREEK SMALL LETTER LAMDA
+  12   2.62%  65.73%  U+02019 ‹’›  GC=Pf    RIGHT SINGLE QUOTATION MARK           42   0.29%  92.21%  U+000F3 ‹ó›  GC=Ll    LATIN SMALL LETTER O WITH ACUTE
+  13   2.51%  68.24%  U+02032 ‹′›  GC=Po    PRIME                                 43   0.26%  92.47%  U+02122 ‹™›  GC=So    TRADE MARK SIGN
+  14   2.44%  70.68%  U+000D7 ‹×›  GC=Sm    MULTIPLICATION SIGN                   44   0.26%  92.73%  U+02236 ‹∶›  GC=Sm    RATIO
+  15   2.04%  72.72%  U+0201D ‹”›  GC=Pf    RIGHT DOUBLE QUOTATION MARK           45   0.22%  92.95%  U+003C7 ‹χ›  GC=Ll    GREEK SMALL LETTER CHI
+  16   2.04%  74.76%  U+0201C ‹“›  GC=Pi    LEFT DOUBLE QUOTATION MARK            46   0.21%  93.17%  U+02021 ‹‡›  GC=Po    DOUBLE DAGGER
+  17   1.54%  76.30%  U+00394 ‹Δ›  GC=Lu    GREEK CAPITAL LETTER DELTA            47   0.21%  93.37%  U+003C4 ‹τ›  GC=Ll    GREEK SMALL LETTER TAU
+  18   1.42%  77.71%  U+000B5 ‹µ›  GC=Ll    MICRO SIGN                            48   0.20%  93.57%  U+003B8 ‹θ›  GC=Ll    GREEK SMALL LETTER THETA
+  19   1.34%  79.05%  U+003B3 ‹γ›  GC=Ll    GREEK SMALL LETTER GAMMA              49   0.20%  93.77%  U+003B5 ‹ε›  GC=Ll    GREEK SMALL LETTER EPSILON
+  20   1.21%  80.26%  U+000E9 ‹é›  GC=Ll    LATIN SMALL LETTER E WITH ACUTE       50   0.18%  93.95%  U+02026 ‹…›  GC=Po    HORIZONTAL ELLIPSIS
+  21   1.15%  81.41%  U+02014 ‹—›  GC=Pd    EM DASH                               51   0.16%  94.11%  U+02211 ‹∑›  GC=Sm    N-ARY SUMMATION
+  22   1.14%  82.55%  U+02018 ‹‘›  GC=Pi    LEFT SINGLE QUOTATION MARK            52   0.15%  94.26%  U+003C0 ‹π›  GC=Ll    GREEK SMALL LETTER PI
+  23   1.00%  83.54%  U+000A9 ‹©›  GC=So    COPYRIGHT SIGN                        53   0.15%  94.40%  U+000EF ‹ï›  GC=Ll    LATIN SMALL LETTER I WITH DIAERESIS
+  24   0.71%  84.25%  U+02265 ‹≥›  GC=Sm    GREATER-THAN OR EQUAL TO              54   0.15%  94.55%  U+000A7 ‹§›  GC=So    SECTION SIGN
+  25   0.60%  84.85%  U+000F6 ‹ö›  GC=Ll    LATIN SMALL LETTER O WITH DIAERESIS   55   0.15%  94.70%  U+02005  ⧆   GC=Zs    FOUR-PER-EM SPACE
+  26   0.60%  85.45%  U+000B7 ‹·›  GC=Po    MIDDLE DOT                            56   0.14%  94.84%  U+003C9 ‹ω›  GC=Ll    GREEK SMALL LETTER OMEGA
+  27   0.60%  86.05%  U+02022 ‹•›  GC=Po    BULLET                                57   0.14%  94.98%  U+000E8 ‹è›  GC=Ll    LATIN SMALL LETTER E WITH GRAVE
+  28   0.59%  86.64%  U+0223C ‹∼›  GC=Sm    TILDE OPERATOR                        58   0.13%  95.12%  U+000F8 ‹ø›  GC=Ll    LATIN SMALL LETTER O WITH STROKE
+  29   0.57%  87.22%  U+003BA ‹κ›  GC=Ll    GREEK SMALL LETTER KAPPA              59   0.13%  95.24%  U+003C1 ‹ρ›  GC=Ll    GREEK SMALL LETTER RHO
+  30   0.57%  87.79%  U+000FC ‹ü›  GC=Ll    LATIN SMALL LETTER U WITH DIAERESIS   60   0.13%  95.37%  U+000E3 ‹ã›  GC=Ll    LATIN SMALL LETTER A WITH TILDE </pre></font>
+
+</div>
+<div class="slide">
+<h1>PMC: Astral Projections
+
+</h1><p>Here are that corpus’s code points above the BMP, in order of popularity. Note 👽 Area 51 !
+
+</p><font size="4">
+<!-- You know, I *so* wanted to properly write "corporis" there instead of 
+     "corpus's" as the genitive of the 3rd declension singular "corpus".  
+     But then if I ever had to form a genitive out of the plural "corpora", 
+     that would then have to be "corporum", and then I'd just have to go 
+     all corpse-like rather than ever explain it to anyone still living. 
+     But it really hurts to write about these corpora's problems, because
+     it looks singular but isn't.  Happy Easter, Damian.
+-->
+
+<pre>  1  U+01D49E ‹𝒞›  GC=Lu    MATHEMATICAL SCRIPT CAPITAL C        31  U+01D4C2 ‹𝓂›  GC=Ll    MATHEMATICAL SCRIPT SMALL M
+  2  U+01D4AF ‹𝒯›  GC=Lu    MATHEMATICAL SCRIPT CAPITAL T        32  U+01D54D ‹𝕍›  GC=Lu    MATHEMATICAL DOUBLE-STRUCK CAPITAL V
+  3  U+01D4AE ‹𝒮›  GC=Lu    MATHEMATICAL SCRIPT CAPITAL S        33  U+01D4B6 ‹𝒶›  GC=Ll    MATHEMATICAL SCRIPT SMALL A
+  4  U+01D49F ‹𝒟›  GC=Lu    MATHEMATICAL SCRIPT CAPITAL D        34  U+01D4BE ‹𝒾›  GC=Ll    MATHEMATICAL SCRIPT SMALL I
+  5  U+01D4B3 ‹𝒳›  GC=Lu    MATHEMATICAL SCRIPT CAPITAL X        35  U+01D4CC ‹𝓌›  GC=Ll    MATHEMATICAL SCRIPT SMALL W
+  6  U+01D4A9 ‹𝒩›  GC=Lu    MATHEMATICAL SCRIPT CAPITAL N        36  U+01D516 ‹𝔖›  GC=Lu    MATHEMATICAL FRAKTUR CAPITAL S
+  7  U+01D4AB ‹𝒫›  GC=Lu    MATHEMATICAL SCRIPT CAPITAL P        37  U+01D4CF ‹𝓏›  GC=Ll    MATHEMATICAL SCRIPT SMALL Z
+  8  U+01D4A2 ‹𝒢›  GC=Lu    MATHEMATICAL SCRIPT CAPITAL G        38  U+01D53B ‹𝔻›  GC=Lu    MATHEMATICAL DOUBLE-STRUCK CAPITAL D
+  9  U+01D49C ‹𝒜›  GC=Lu    MATHEMATICAL SCRIPT CAPITAL A        39  U+01D54B ‹𝕋›  GC=Lu    MATHEMATICAL DOUBLE-STRUCK CAPITAL T
+ 10  U+01D53C ‹𝔼›  GC=Lu    MATHEMATICAL DOUBLE-STRUCK CAPITAL E 40  U+01D4BB ‹𝒻›  GC=Ll    MATHEMATICAL SCRIPT SMALL F
+ 11  U+01D4AA ‹𝒪›  GC=Lu    MATHEMATICAL SCRIPT CAPITAL O        41  U+01D4CA ‹𝓊›  GC=Ll    MATHEMATICAL SCRIPT SMALL U
+ 12  U+01D4A5 ‹𝒥›  GC=Lu    MATHEMATICAL SCRIPT CAPITAL J        42  U+01D507 ‹𝔇›  GC=Lu    MATHEMATICAL FRAKTUR CAPITAL D
+ 13  U+01D4A6 ‹𝒦›  GC=Lu    MATHEMATICAL SCRIPT CAPITAL K        43  U+01D542 ‹𝕂›  GC=Lu    MATHEMATICAL DOUBLE-STRUCK CAPITAL K
+ 14  U+01D4B1 ‹𝒱›  GC=Lu    MATHEMATICAL SCRIPT CAPITAL V        44  U+01D546 ‹𝕆›  GC=Lu    MATHEMATICAL DOUBLE-STRUCK CAPITAL O
+ 15  U+01D4B2 ‹𝒲›  GC=Lu    MATHEMATICAL SCRIPT CAPITAL W        45  U+01D4BD ‹𝒽›  GC=Ll    MATHEMATICAL SCRIPT SMALL H
+ 16  U+01D4B4 ‹𝒴›  GC=Lu    MATHEMATICAL SCRIPT CAPITAL Y        46  U+01D4C5 ‹𝓅›  GC=Ll    MATHEMATICAL SCRIPT SMALL P
+ 17  U+01D4B5 ‹𝒵›  GC=Lu    MATHEMATICAL SCRIPT CAPITAL Z        47  U+01D505 ‹𝔅›  GC=Lu    MATHEMATICAL FRAKTUR CAPITAL B
+ 18  U+01D4B0 ‹𝒰›  GC=Lu    MATHEMATICAL SCRIPT CAPITAL U        48  U+01D50E ‹𝔎›  GC=Lu    MATHEMATICAL FRAKTUR CAPITAL K
+ 19  U+01D4AC ‹𝒬›  GC=Lu    MATHEMATICAL SCRIPT CAPITAL Q        49  U+01D541 ‹𝕁›  GC=Lu    MATHEMATICAL DOUBLE-STRUCK CAPITAL J
+ 20  U+01D54A ‹𝕊›  GC=Lu    MATHEMATICAL DOUBLE-STRUCK CAPITAL S 50  U+01D543 ‹𝕃›  GC=Lu    MATHEMATICAL DOUBLE-STRUCK CAPITAL L
+ 21  U+01D539 ‹𝔹›  GC=Lu    MATHEMATICAL DOUBLE-STRUCK CAPITAL B 51  U+100002  ⧆   GC=Co    &lt;private use code point in plane 16>
+ 22  U+01D5A7 ‹𝖧›  GC=Lu    MATHEMATICAL SANS-SERIF CAPITAL H    52  U+01D4B8 ‹𝒸›  GC=Ll    MATHEMATICAL SCRIPT SMALL C
+ 23  U+01D517 ‹𝔗›  GC=Lu    MATHEMATICAL FRAKTUR CAPITAL T       53  U+01D4C1 ‹𝓁›  GC=Ll    MATHEMATICAL SCRIPT SMALL L
+ 24  U+01D4C3 ‹𝓃›  GC=Ll    MATHEMATICAL SCRIPT SMALL N          54  U+01D53D ‹𝔽›  GC=Lu    MATHEMATICAL DOUBLE-STRUCK CAPITAL F
+ 25  U+01D535 ‹𝔵›  GC=Ll    MATHEMATICAL FRAKTUR SMALL X         55  U+01D53E ‹𝔾›  GC=Lu    MATHEMATICAL DOUBLE-STRUCK CAPITAL G
+ 26  U+01D4BF ‹𝒿›  GC=Ll    MATHEMATICAL SCRIPT SMALL J          56  U+01D54C ‹𝕌›  GC=Lu    MATHEMATICAL DOUBLE-STRUCK CAPITAL U
+ 27  U+01D540 ‹𝕀›  GC=Lu    MATHEMATICAL DOUBLE-STRUCK CAPITAL I 57  U+01D6A4 ‹𝚤›  GC=Ll    MATHEMATICAL ITALIC SMALL DOTLESS I
+ 28  U+01D465 ‹𝑥›  GC=Ll    MATHEMATICAL ITALIC SMALL X          58  U+01D7D9 ‹𝟙›  GC=Nd    MATHEMATICAL DOUBLE-STRUCK DIGIT ONE
+ 29  U+01D4CE ‹𝓎›  GC=Ll    MATHEMATICAL SCRIPT SMALL Y
+ 30  U+01D538 ‹𝔸›  GC=Lu    MATHEMATICAL DOUBLE-STRUCK CAPITAL A </pre></font>
+
+</div>
+<div class="slide">
+<h1>PMC: Graphemes <i>&</i> Ideographs
+
+</h1><ul><li level="1">PMC has plenty of “extended grapheme clusters”, glyphs
+that occupy more than one code point. You 
+must make sure never to split up graphemes.  Code points with the property 
+<code>Bidi_Class=Nonspacing_Mark</code>
+(<code>BC=NSM</code> for short) are here in abundance: 
+<code>◌̂</code>,
+<code>◌̅</code>,
+<code>◌̄</code>,
+<code>◌̇</code>,
+<code>◌̃</code>,
+<code>◌⃗</code>,
+<code>◌⃞</code>,
+<code>◌̲</code>,
+<code>◌̀</code>,
+<code>◌͂</code>,
+<code>◌́</code>,
+<code>◌̊</code>,
+<code>◌̆</code>,
+<code>◌︀</code>,
+<code>◌̵</code>,
+<code>◌̑</code>,
+<code>◌̧</code>,
+<code>◌⃑</code>,
+<code>◌̣</code>,
+<code>◌̈</code>,
+<code>◌̣</code>,
+<code>◌̷</code>,
+<code>◌́</code>,
+<code>◌̋</code>,
+<code>◌̌</code>,
+<code>◌͘</code>,
+<code>◌⃛</code>,
+<code>◌֗</code>,
+<code>◌̨</code>,
+<code>◌̓</code>,
+<code>◌̈́</code>,
+<code>◌ْ</code>, and
+<code>◌ྞ</code>.
+
+</li><li level="1">You get to deal with CJK uniﬁed ideographs like
+
+<font face="'Kozunka Mincho Pro', 'LiSong Pro', serif">
+所
+文
+有
+條
+獨
+祴
+舰
+蜓
+鞒
+鞔
+㛧
+㛨
+㛩
+㛪
+㛫
+㛬
+㛭
+㛮
+㛯
+㬒
+㬡
+</font>
+
+</li><li level="1">And then there’s Hangul like
+
+<font face="'Adobe Myungjo Std', 'Kozunka Mincho Pro', 'LiSong Pro', serif">
+가
+간
+것
+게
+경
+과
+구
+규
+까
+낸
+느
+니
+당
+더
+도
+되
+된
+됩
+들
+때
+라
+람
+렸
+록
+류
+만
+말
+면
+모
+미
+배
+본
+분
+사
+생
+선
+성
+세
+수
+슷
+신
+십
+쓰
+씩
+아
+약
+어
+여
+오
+외
+울
+은
+음
+의
+인
+읽
+있
+잘
+적
+정
+주
+지
+최
+친
+특
+하
+한
+항
+호
+후
+</font>
+
+</li></ul></div>
+<div class="slide">
+<h1>Feature Support Summary
+
+</h1><p>Here’s what each language natively supports <i>in its standard distribution</i>.
+A white check mark isn’t quite all there, and a superscripted plus
+says it goes <i>beyond</i> what’s stated. 🌟 
+
+</p><font size="3">
+<table>
+<table border=4 cellspacing=2 cellpadding=5 align=center>
+
+<tr>
+<th><i>Unicode</i></th>
+<td>𝒥𝒶𝓋𝒶𝓈𝒸𝓇𝒾𝓅𝓉</td>
+<td align=center><b>ᴘʜᴘ</b></td>
+<th>Go</th>
+<td>💎  <b>Ruby</b></td>
+<td>🐍  <b>Python</b></td>
+<td>☕  <b>Java</b></th>
+<td>🐪  <b>Perl</b></th>
+</tr>
+
+
+<tr> <th>Internally</th>
+<td align=center>UCS‐2 <i>or</i><br>UTF‐16</td>      <!-- Javascript -->
+<td align=center>UTF‐8⁻</td>     <!-- PHP -->
+<td align=center>UTF‐8</td>      <!-- Go -->
+<td align=center>varies</td>     <!-- Ruby -->
+<td align=center>UCS‐2 <i>or</i><br>UCS‐4</td>      <!-- Python -->
+<td align=center>UTF‐16</td>     <!-- Java -->
+<td align=center>UTF‐8⁺</td>     <!-- Perl -->
+</tr>
+
+<tr> <th>Identiﬁers</th>
+<td align=center>─</td>         <!-- Javascript -->
+<td align=center><font face="Symbola">✔</font></td>         <!-- PHP -->
+<td align=center><font face="Symbola">✔</font></td>         <!-- Go -->
+<td align=center><font face="Symbola">✔</font></td>         <!-- Ruby -->
+<td align=center><font face="Symbola">✅</font><sup>∓</sup></td>         <!-- Python -->
+<td align=center><font face="Symbola">✔</font></td>         <!-- Java -->
+<td align=center><font face="Symbola">✔</font></td>         <!-- Perl -->
+</tr>
+
+<tr> <th>Casefolding</th>
+<td align=center>none</td>        <!-- Javascript -->
+<td align=center>simple</td>       <!-- PHP -->
+<td align=center>simple</td>        <!-- Go -->
+<td align=center>full</td>         <!-- Ruby -->
+<td align=center>none</td>        <!-- Python -->
+<td align=center>simple</td>       <!-- Java -->
+<td align=center>full</td>         <!-- Perl -->
+</tr>
+
+<tr> <th>Casemapping</th>
+<td align=center>simple</td>       <!-- Javascript -->
+<td align=center>simple</td>       <!-- PHP -->
+<td align=center>simple<sup>∓</sup></td>       <!-- Go -->
+<td align=center>full</td>         <!-- Ruby -->
+<td align=center>simple</td>       <!-- Python -->
+<td align=center>full</td>         <!-- Java -->
+<td align=center>full</td>         <!-- Perl -->
+</tr>
+
+<tr> <th>Graphemes</th>
+<td align=center>─</td>         <!-- Javascript -->
+<td align=center><font face="Symbola">✅</font></td>        <!-- PHP -->
+<td align=center>─</td>        <!-- Go -->
+<td align=center>─</td>        <!-- Ruby -->
+<td align=center>─</td>         <!-- Python -->
+<td align=center>─</td>         <!-- Java -->
+<td align=center><font face="Symbola">✔</font></td>         <!-- Perl -->
+</tr>
+
+<tr> <th>Normalization</th>
+<td align=center>─</td>         <!-- Javascript -->
+<td align=center><font face="Symbola">✔</font></td>         <!-- PHP -->
+<td align=center>─⁺</td>         <!-- Go -->
+<td align=center>─</td>         <!-- Ruby -->
+<td align=center><font face="Symbola">✔</font></td>         <!-- Python -->
+<td align=center><font face="Symbola">✔</font></td>         <!-- Java -->
+<td align=center><font face="Symbola">✔</font></td>         <!-- Perl -->
+</tr>
+
+<tr> <th>UCA Collation</th>
+<td align=center>─</td>         <!-- Javascript -->
+<td align=center>─</td>         <!-- PHP -->
+<td align=center>─</td>        <!-- Go -->
+<td align=center>─</td>        <!-- Ruby -->
+<td align=center>─</td>        <!-- Python -->
+<td align=center>─</td>        <!-- Java -->
+<td align=center>✔⁺</td>        <!-- Perl -->
+</tr>
+
+<tr> <th>Named Characters</th>
+<td align=center>─</td>         <!-- Javascript -->
+<td align=center>─</td>         <!-- PHP -->
+<td align=center>─</td>         <!-- Go -->
+<td align=center>─</td>         <!-- Ruby -->
+<td align=center><font face="Symbola">✅</font></td>            <!-- Python -->
+<td align=center>─</td>         <!-- Java -->
+<td align=center><font face="Symbola">✔</font>⁺</td>        <!-- Perl -->
+</tr>
+
+<tr> <th>Properties</th>
+<td align=center>─</td>        <!-- Javascript -->
+<td align=center>two</td>         <!-- PHP -->
+<td align=center>(non‐regex)⁻</td>         <!-- Go -->
+<td align=center>three</td>         <!-- Ruby -->
+<td align=center>(non‐regex)⁻</td>                 <!-- Python -->
+<td align=center>two⁺</td>    <!-- Java -->
+<td align=center>every⁺</td>        <!-- Perl -->
+</tr>
+
+</table>
+</font>
+
+</div>
+<div class="slide">
+<h1>Unicode Properties in Regexes
+
+</h1><p></p>
+
+<font size="3">
+<table>
+<table border=4 cellspacing=2 cellpadding=4 align=center>
+
+
+<tr>
+<th><i>Property</i></th>
+<th>Javascript</th>
+<th>Javascript<br>w/<code>XRegExp</code></th>
+<th>ᴘʜᴘ<sup>5</sup><br>w/<code>PCRE</code></th>
+<th>Go<sup>5</sup><br>w/<code>RE2</code></th>
+<th>Ruby<sup>1.9</sup></th>
+<th>Python<sup>3.2</sup></th>
+<th>Python<sup>3.2</sup><br>w/<code>regex</code></th>
+<th>Java<sup>1.6</sup></th>
+<th>Java<sup>1.7</sup></th>
+<th>ICU</th>
+<th>Perl</th>
+</tr>
+
+
+
+<tr>
+<th>General Category</th>
+<td align=center>─</td>  <!-- Javascript -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- Javascript w/XRegExp -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- PHP5 w/PCRE -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- Ruby 1.9 -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- Go w/RE2 -->
+<td align=center>─</td>  <!-- Python -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- Python w/regex -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- Java 1.6 -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- Java 1.7 -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- ICU -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- Perl -->
+</tr>
+
+<tr> <th>Script</th>
+<td align=center>─</td>  <!-- Javascript -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- Javascript w/XRegExp -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- PHP5 w/PCRE -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- Go w/RE2 -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- Ruby 1.9 -->
+<td align=center>─</td>  <!-- Python -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- Python w/regex -->
+<td align=center>─</td>  <!-- Java 1.6 -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- Java 1.7 -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- ICU -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- Perl -->
+</tr>
+
+<tr> <th>Two‐Parters</th>
+<td align=center>─</td>  <!-- Javascript -->
+<td align=center>─</td>  <!-- Javascript w/XRegExp -->
+<td align=center>─</td>  <!-- PHP5 w/PCRE -->
+<td align=center>─</td>  <!-- Go w/RE2 -->
+<td align=center>─</td>  <!-- Ruby 1.9 -->
+<td align=center>─</td>  <!-- Python -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- Python w/regex --> 
+<td align=center>─</td>  <!-- Java 1.6 -->
+<td align=center><font face="Symbola">✅</font>⁻</td>  <!-- Java 1.7 -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- ICU -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- Perl -->
+</tr>
+
+<tr> <th>Long Names</th>
+<td align=center>─</td>  <!-- Javascript -->
+<td align=center>─</td>  <!-- Javascript w/XRegExp -->
+<td align=center>─</td>  <!-- PHP5 w/PCRE -->
+<td align=center>─</td>  <!-- Go w/RE2 -->
+<td align=center>─</td>  <!-- Ruby 1.9 -->
+<td align=center>─</td>  <!-- Python -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- Python w/regex -->
+<td align=center>─</td>  <!-- Java 1.6 -->
+<td align=center>─</td>  <!-- Java 1.7 -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- ICU -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- Perl -->
+</tr>
+
+<tr> <th>Loose Matching</th>
+<td align=center>─</td>  <!-- Javascript -->
+<td align=center>─</td>  <!-- Javascript w/XRegExp -->
+<td align=center>─</td>  <!-- PHP5 w/PCRE -->
+<td align=center>─</td>  <!-- Go w/RE2 -->
+<td align=center>─</td>  <!-- Ruby 1.9 -->
+<td align=center>─</td>  <!-- Python -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- Python w/regex --> 
+<td align=center>─</td>  <!-- Java 1.6 -->
+<td align=center><font face="Symbola">✅</font></td>  <!-- Java 1.7 -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- ICU -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- Perl -->
+</tr>
+
+<tr> <th>Name/Value Aliases</th>
+<td align=center>─</td>  <!-- Javascript -->
+<td align=center>─</td>  <!-- Javascript w/XRegExp -->
+<td align=center>─</td>  <!-- PHP5 w/PCRE -->
+<td align=center>─</td>  <!-- Go w/RE2 -->
+<td align=center>─</td>  <!-- Ruby 1.9 -->
+<td align=center>─</td>  <!-- Python -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- Python w/regex -->
+<td align=center>─</td>  <!-- Java 1.6 -->
+<td align=center><font face="Symbola">✅</font></td>  <!-- Java 1.7 -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- ICU -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- Perl -->
+</tr>
+
+<tr> <th>User‐Deﬁned</th>
+<td align=center>─</td>  <!-- Javascript -->
+<td align=center>─</td>  <!-- Javascript w/XRegExp -->
+<td align=center>─</td>  <!-- PHP5 w/PCRE -->
+<td align=center>─</td>  <!-- Go w/RE2 -->
+<td align=center>─</td>  <!-- Ruby 1.9 -->
+<td align=center>─</td>  <!-- Python -->
+<td align=center>─</td>  <!-- Python w/regex -->
+<td align=center>─</td>  <!-- Java 1.6 -->
+<td align=center>─</td>  <!-- Java 1.7 -->
+<td align=center>─</td>  <!-- ICU -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- Perl -->
+</tr>
+
+<tr> <th>UTS#18 RL 1.2</th>
+<td align=center>─</td>  <!-- Javascript -->
+<td align=center>─</td>  <!-- Javascript w/XRegExp -->
+<td align=center>─</td>  <!-- PHP5 w/PCRE -->
+<td align=center>─</td>  <!-- Go w/RE2 -->
+<td align=center>─</td>  <!-- Ruby 1.9 -->
+<td align=center>─</td>  <!-- Python -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- Python w/regex --> 
+<td align=center>─</td>  <!-- Java 1.6 -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- Java 1.7 -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- ICU -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- Perl -->
+</tr>
+
+<tr> <th>UTS#18 RL 1.2<sup>a</sup></th>
+<td align=center>─</td>  <!-- Javascript -->
+<td align=center>─</td>  <!-- Javascript w/XRegExp -->
+<td align=center>─<sup>?</sub></td>  <!-- PHP5 w/PCRE -->
+<td align=center>─</td>  <!-- Go w/RE2 -->
+<td align=center><font face="Symbola">✅</font></td>  <!-- Ruby 1.9 -->
+<td align=center><font face="Symbola">✅</font></td>  <!-- Python -->
+<td align=center><font face="Symbola">✔</font>⁺</td>  <!-- Python w/regex -->
+<td align=center>─</td>  <!-- Java 1.6 -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- Java 1.7 -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- ICU -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- Perl -->
+</tr>
+
+<tr> <th>UTS#18 RL 2.2</th>
+<td align=center>─</td>  <!-- Javascript -->
+<td align=center>─</td>  <!-- Javascript w/XRegExp -->
+<td align=center><font face="Symbola">✅</font></td>   <!-- PHP5 w/PCRE -->
+<td align=center>─</td>  <!-- Go w/RE2 -->
+<td align=center>─</td>  <!-- Ruby 1.9 -->
+<td align=center>─</td>  <!-- Python -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- Python w/regex -->
+<td align=center>─</td>  <!-- Java 1.6 -->
+<td align=center>─</td>  <!-- Java 1.7 -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- ICU -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- Perl -->
+</tr>
+
+<tr> <th>UTS#18 RL 2.7</th>
+<td align=center>─</td>  <!-- Javascript -->
+<td align=center>─</td>  <!-- Javascript w/XRegExp -->
+<td align=center>─</td>  <!-- PHP5 w/PCRE -->
+<td align=center>─</td>  <!-- Go w/RE2 -->
+<td align=center>─</td>  <!-- Ruby 1.9 -->
+<td align=center>─</td>  <!-- Python -->
+<td align=center><font face="Symbola">✅</font></td>  <!-- Python -->
+<td align=center>─</td>  <!-- Java 1.6 -->
+<td align=center>─</td>  <!-- Java 1.7 -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- ICU -->
+<td align=center><font face="Symbola">✔</font></td>  <!-- Perl -->
+</tr>
+
+</table>
+</font>
+
+</div>
+<div class="slide">
+<h1>Conservation of Pain <i>&</i> Suﬀering?
+
+</h1><ul><li level="1">There is no one “right” answer in any of this.
+
+</li><li level="1">Every language has its own set of Unicode ups and downs.
+
+</li><li level="1">I’m not suggesting anyone exchange the devil they know for one they don’t.
+
+</li><li level="1">That doesn’t mean all platforms are equal here.  Some really 
+<i>are</i> more painful to use.
+
+</li><li level="1">Certain common trends <i>do</i> emerge when you look across 
+the language spectrum.
+
+</li></ul></div>
+<div class="slide">
+<h1>Trends Across Languages
+
+</h1><ul><li level="1">Languages with longer legacies have sizable pods of hysterical 
+porpoises to appease, which newer languages may not. 
+
+</li><li level="1">Compatibility with 8‐ and 
+especially 16-bit character sets is a major drag.
+
+</li><li level="1">Extending the repertoire to 21 bits doesn’t resolve broken
+assumptions, because <b>Unicode is <i>much more</i> than just “more
+characters”.</b>  Check out the blue boxes here to see what I mean:
+
+<pre> http://unicode.org/charts/case/
+ http://unicode.org/charts/case/chart_Latin.html </pre></li><li level="1">Try to get the latest releases of all these languages; it makes a big diﬀerence. 
+
+</li><li level="1">For example, this talk originally included a bunch of pain about
+Unicode in Python v2.7, but I deleted all the v2.7 material to get past the
+profanity ﬁlters.
+
+</li></ul></div>
+<div class="slide">
+<h1>Javascript ≠ Java’s Crypt
+
+</h1><ul><li level="1">Javascript still uses (or <i>can</i> use: the standard allow for either UTF‐16 <i>or</i> UCS‐2) the broken and 
+ancient UCS‐2 — which is <b><i>not a valid Unicode encoding!</i></b>
+
+</li><li level="1">No support for named characters like <code>\N{WHITE SMILING FACE}</code>; you
+must use magic numbers like <code>\u263A</code> instead.  Notice that’s not 
+enough digits.
+
+</li><li level="1">Because literals are speciﬁed using exactly four hex digits <code>\u<i>XXXX</i></code>,
+Javascript supports only ¹⁄₁₇ᵗʰ of Unicode, the 5.88% that occupies Plane Zero.  
+
+</li><li level="1">The ᴇᴄᴍᴀScript standard wickedly deﬁnes string values <i>not</i> as sequences of 
+characters, but rather as sequences of 16-bit “code units”.  
+
+</li><li level="1">This is super‐nasty.  
+
+</div>
+<div class="slide">
+<h1>The UTF‐16 <i>née</i> UCS‐2 Curse
+
+</h1><ul><li level="1">Like several other languages, Javascript suﬀers from <i>The UTF‐16 Curse</i>.
+
+</li><li level="1">Except that Javascript has an even worse form of it, <i>The UCS‐2 Curse</i>.
+Things like <code>charCodeAt</code> and <code>fromCharCode</code> only ever deal with 16‐bit
+quantities, not with real, 21‐bit Unicode code points.
+
+</li><li level="1">Therefore, if you want to print out something like 𝒜, 
+U+1D49C,  <code>MATHEMATICAL SCRIPT CAPITAL A</code>,
+you have to specify not one character but 
+two “char units”: <code>"\uD835\uDC9C"</code>.  😱 
+
+<pre> # ERROR!!
+ document.write(String.fromCharCode(0x1D49C));
+
+ # needed bogosity
+ document.write(String.fromCharCode(0xD835,0xDC9C)); </pre></li></ul></div>
+<div class="slide">
+<h1>Testing for UTF‐16 <i>vs</i> UCS‐2 
+
+</h1><ul><li level="1">You cannot write portable code because you cannot foresee which encoding
+is used internally.
+
+</li><li level="1">However, on any <i>given</i> Javascript interpreter, you can test for which
+of the two you have this way:
+
+<pre>    var div = document.createElement("DIV"); 
+    div.innerHTML = "&amp;#0x10000;"; 
+    var isUtf16 = div.firstChild.nodeValue.charCodeAt(0) == 0xd800; </pre></li></ul></div>
+<div class="slide">
+<h1>Javascript Regexes 👎 
+
+</h1><ul><li level="1">Regex character classes are <i>still</i> ASCII only.  You can never
+make <code>\w</code>, <code>\d</code>, <i>&c</i> work on trans‐ASCII Unicode as <b>required</b> by
+Unicode’s <i>UTS #18 Regular Expressions</i> in its <i>Annex C: Compatibility
+Properties</i>.  This is a severe hardship.
+
+</li><li level="1">You will never be able to write regexes like
+<code>[𝒜-𝒵]</code> since that gets misinterpreted as <code>[\uD835\uDC9C-\uD835\uDCB5]</code>.
+Actually, you won’t even get that far:
+
+<pre> new RegExp("[𝒜-𝒵]", "i") returned a SyntaxError:
+   RegExp constructor: invalid regular expression </pre></li><li level="1">A Javascript plugin exists that adds
+support for three <b>(yes, <i>just</i> 3!)</b> Unicode properties
+via <code>\p{<i>PROP</i>}</code> and <code>\P{<i>PROP</i>}</code>:
+
+<pre> http://xregexp.com/plugins/ </pre><ul><li level="1">a <code><i>General Category</i></code> <b>abbreviation</b> like <code>\p{Sc}</code>
+
+</li><li level="1">a <code><i>Script</i></code> name like <code>\p{Latin}</code>
+
+</li><li level="1">a <code><i>Block</i></code> property like
+<code>\p{InMathematicalAlphanumericSymbols}</code>  (except that one won’t work:
+it lies outside the ¹⁄₁₇ᵗʰ of Unicode Javascript can even think about)
+
+</li></ul></div>
+<div class="slide">
+<h1>The <i>XRegExp</i> Plugin <i>(cont...)</i>
+
+</h1><ul><li level="1">You still have to use obscenely ＼＼𝕕𝕠𝕦𝕓𝕝𝕖𝕕  ＼＼𝕓𝕒𝕔𝕜𝕤𝕝𝕒𝕤𝕙𝕖𝕤  like
+
+<pre>    XRegExp("[^\\p{Latin}\\p{Common}]"); </pre></li><li level="1">The <code>XRegExp</code> plugin doesn’t even support basic properties like <code>Alphabetic</code>,
+<code>Uppercase</code>, and <code>Lowercase</code>, all required by UTS#18 for Level 1 Unicode Support.
+
+</li><li level="1">It has no support for grapheme clusters whatsoever.
+
+</li><li level="1">No matter what, you’re still stuck with only ¹⁄₁₇ᵗʰ of Unicode — which is simply 
+not acceptable. 
+
+
+</li><li level="1">How in the world are you ever going to fully deal with a real corpus 
+like the one I showed at the start?
+
+</li><li level="1">You aren’t.   
+
+</li></ul></div>
+<div class="slide">
+<h1>PHP
+
+</h1><ul><li level="1">PHP⁵ is a <i>little</i> better than Javascript,  but it will still
+make you pull your hair out.
+
+</li><li level="1">The fabled PHP⁶ “with (full) Unicode support” seems to have been cancelled. 
+
+</li><li level="1">PHP’s “new” <code>preg_*</code> functions indeed use PCRE.
+
+</li><li level="1">However...
+
+</li></ul></div>
+<div class="slide">
+<h1>PHP: PCRE Issues
+
+</h1><ul><li level="1">Your version of PHP has to be linked with a version of PCRE that was
+built with Unicode support in it; this is not the default.  
+
+</li><li level="1">You still have to always, always remember to use <b><code>/u</code></b> on your
+patterns to get the Unicode character sense instead of the “byte” sense.
+
+</li><li level="1">You will never(?)
+get <code>\w</code>, <code>\d</code>, <i>&c</i> to work the way UTS#18 says they must.  
+
+</li><li level="1">Property support is limited to just two only: the <code><i>General Category</i></code> <b>abbreviations</b>
+and the <code><i>Script</i></code> properties.
+
+</li><li level="1">Its <code>\X</code> is the old broken <code>(?>\PM\pM*)</code>, which is 🛂 <i>not</i> 🛂  
+a Unicode grapheme cluster as currently deﬁned 
+in UTS#18 <i>&</i> UTS#29.
+
+</li></ul></div>
+<div class="slide">
+<h1>PHP: The Ugly News
+
+</h1><ul><li level="1">PHP doesn’t really have native support for Unicode.
+
+</li><li level="1">You must always ignore normal functions
+like <code>strlen</code>, <code>strstr</code>, <code>strpos</code>, and <code>substr</code> 
+
+</li><li level="1">Instead you have to remember to use
+<code>mb_strlen</code>, <code>mb_strstr</code>, <code>mb_strpos</code>, and
+<code>mb_substr</code> instead.
+
+</li></ul></div>
+<div class="slide">
+<h1>PHP Titlecasing
+
+</h1><ul><li level="1">Unlike Javascript, PHP actually makes a stab at titlecasing, something
+required by Unicode. 
+
+</li><li level="1">However it does simple casemapping only, never 
+the default Unicode casemapping, which is full casemapping.   This is especially annoying with titlecasing.
+
+</li><li level="1">That means you can correctly titlecase <i>ǳur</i> <code>"\x{1F3}ur"</code> to <i>ǲur</i> <code>"\x{1F2}ur"</code>:  
+
+<pre> # PASS
+ mb_convert_case("ǳur", MB_CASE_TITLE, "UTF-8"); </pre></li><li level="1">But you cannot get  <i>ß</i> <code>"\x{DF}"</code> to properly become <i>Ss</i>,
+<i>ﬁle</i> <code>"\x{FB01}le"</code> to become <i>Fi</i>, nor <i>ﬅop</i> <code>"\x{FB05}op"</code> to become <i>Stop</i>.  
+
+<pre> # FAIL
+ mb_convert_case("ﬅop", MB_CASE_TITLE, "UTF-8"); </pre></li></ul></div>
+<div class="slide">
+<h1>Go Figure!
+
+</h1><ul><li level="1">Of all the languages I played around with for this talk, Go was
+hands down the easiest — and possibly the most pleasurable — to 
+use UTF‐8 with.  
+
+</li><li level="1">Go ﬁgger.  😉  
+
+</li><li level="1">Its 
+
+<font face="junicode, sans, mono">ᚱᚢᛋᚾᚲ</font> heritage from Plan9 shows.  
+
+</li><li level="1">This is hardly a bad thing.
+
+</div>
+<div class="slide">
+<h1>Go: The Good News
+
+</h1><ul><li level="1">It’s new.
+
+</li><li level="1">No special syntax, declarations, functions, <i>&c</i> are needed to
+get any and all of Go to work with Unicode in its
+
+<ul><li level="1">source code
+
+</li><li level="1">program identiﬁers
+
+</li><li level="1">character or string literals
+
+</li><li level="1">casing
+
+</li><li level="1">regexes
+
+</li><li level="1">I/O streams
+
+</li></ul></li><li level="1">This is both exciting and encouraging.
+
+</li></ul></div>
+<div class="slide">
+<h1>Go: The Bad News
+
+</h1><ul><li level="1">It’s new.  (Yes, I know I said that already.)
+
+</li><li level="1">Standard libraries for key Unicode components lag.
+
+<ul><li level="1">Normalization — standard library <i>almost</i> there.
+
+</li><li level="1">Collation — is in the make, but collation is harder yet
+essential, because comparison underlies nearly everything we do with text.
+
+</li><li level="1">Regexes — a new standard library, equivalent  to 
+Russ Cox’s <i>RE2</i> library, is currently 
+ imported as <code>exp/regexp</code>.  It provides for (simple) Unicode casefolding and
+includes access to the Unicode <code>General Category</code> and <code>Script</code> properties.
+
+</li></ul></li></ul></div>
+<div class="slide">
+<h1>Go: The Ugly News
+
+</h1><ul><li level="1">This is Go: it doesn’t do ugly.
+
+</li></ul></li></ul></div>
+<div class="slide">
+<h1>Ruby: The Bad News
+
+</h1><ul><li level="1">Fresh out of the box, Ruby at ﬁrst <i>appears</i> so broken <i>vis‐à‐vis</i> Unicode
+as to be unusable.  
+
+</li><li level="1">It treats your source code as being in some nonportable local encoding.  
+
+</li><li level="1">Its <code>String</code> functions like <code>upcase</code> or <code>capitalize</code> won’t even look
+at anything but ASCII. 
+
+</li><li level="1">Its regexes ignore your Unicode.   
+
+</li><li level="1">It’s completely missing <i>a whole lot</i> of critical Unicode functionality:  
+
+<ul><li level="1">casemapping <i>&</i> -folding
+
+</li><li level="1">grapheme support
+
+</li><li level="1">normalization
+
+</li><li level="1">collation
+
+</li><li level="1">text segmentation,
+<i>&c</i>
+<i>&c</i>
+<i>&c</i>.
+
+</li></ul></div>
+<div class="slide">
+<h1>Ruby: The Ugly News
+
+</h1><ul><li level="1">Every Ruby string carries around its encoding, instead of sanely unifying
+into Unicode internally like nearly everything else does.  
+
+</li><li level="1">Supposedly this is to avoid round‐trip losses in certain legacy Asian encodings
+that would otherwise lose information due to <i>“Han Uniﬁcation”</i>.   
+(If you <i>don’t</i> know what that means, consider yourself lucky. Very lucky.)
+
+</li><li level="1">Because of this ugliness, you might <i>think</i> things like <code>\p{Lu}</code> 
+are ﬁne in your regexes because they work on your system — under a UTF‐8 locale.  
+Now. But move the script to something laboring under CP1252 and suddenly you 
+have an error!   
+
+</li><li level="1">Indeed the same pattern that runs on one string may blow up on another
+all in the same program.
+
+</li><li level="1">You seem(?) to be able to avoid this by always using the <b><code>/u</code></b> regex ﬂag.
+
+</li></ul></div>
+<div class="slide">
+<h1>Ruby: The Good News
+
+</h1><ul><li level="1">However, it turns out that Ruby is one of the better choices for Unicode work.  
+
+</li><li level="1">If you want to work with Unicode in Ruby, then you <i>must</i> use v1.9 or
+better.  Don’t even dream of using anything less.  
+
+</li><li level="1">Declare your source code to be UTF‐8 with a signiﬁcant
+comment as the ﬁrst line:
+
+<pre>  #!/usr/bin/env ruby
+  #coding: utf-8 </pre></li><li level="1">Ruby even allows proper Unicode identiﬁers.  
+
+<pre> #!/usr/bin/env ruby
+ #coding: utf-8
+ 𝔘𝔫𝔦𝔠𝔬𝔡𝔢   = "super";       puts 𝔘𝔫𝔦𝔠𝔬𝔡𝔢
+ niño    = "boy";           puts niño
+ both    = 𝔘𝔫𝔦𝔠𝔬𝔡𝔢 + niño;  puts both  
+ 
+ # Yep, it’s superboy! </pre></li></ul></div>
+<div class="slide">
+<h1>Ruby: The Best News
+
+</h1><ul><li level="1">The solution to the Ruby “bad news” in the last bullet three
+slides ago is to install the <code>unicode_utils</code> gem, available via <code>gem
+ininstall unicode_utils</code> or from
+
+<pre> http://unicode-utils.rubyforge.org/ </pre></li><li level="1">The library includes support for Unicode normalization, character names, 
+graphemes, combining classes, casefolding, and casemapping. 
+
+</li><li level="1">For example, Ruby now does full and correct casemapping — <i>provided</i> you use it this way:
+
+<pre>  #!/usr/bin/env ruby
+  #coding: utf-8
+  require 'unicode_utils'
+  puts "lower is " + UnicodeUtils.downcase(str)
+  puts "title is " + UnicodeUtils.titlecase(str)
+  puts "upper is " + UnicodeUtils.upcase(str) </pre></li></ul></div>
+<div class="slide">
+<h1>Ruby Regexes: Good News...
+
+</h1><ul><li level="1">Unlike anything we’ve looked at so far, Ruby actually implements
+full Unicode case<i>folding</i> in its regexes:
+
+<pre>  % ruby -le 'print " WEISS" =~ /weiß/i'
+  1 </pre></li><li level="1">Or, in a longer example:
+
+<pre>    #!/usr/bin/env ruby
+    #coding: utf-8
+
+    str = " ᾲ στο διάολο";
+    puts str =~ /ᾺΙ ΣΤΟ ΔΙΆΟΛΟ/i ? "PASS" : "FAIL";
+ PASS </pre></li></ul></div>
+<div class="slide">
+<h1>Ruby Regexes: ...and Bad News 
+
+</h1><ul><li level="1">Unfortunately, regexes are just where Ruby’s Unicode
+support is weakest.  
+
+</li><li level="1">Only two properties are supported: <code>General Category</code> and <code>Script</code>.
+
+</li><li level="1">It fails to correctly implement UTS#18’s RL1.2a: that means
+your <code>\w</code>, <code>\d</code>, <i>&c</i> won’t work right, and even <code>\p{alphabetic}</code> is broken.  
+
+</li><li level="1"><code>\w</code> won’t work except on ASCII, even with the <code>/u</code> ﬂag. 
+
+</li><li level="1">Ruby seems to make up its own rules about what some of its properties
+mean instead of using Unicode’s rules.  <b>You aren’t allowed to use the same property 
+name with a diﬀerent meaning than the oﬃcial one.</b>  This is a violation. 🛂
+
+</li></ul></div>
+<div class="slide">
+<h1>Python: (Some) Good News 
+
+</h1><ul><li level="1">Python v3 is the ﬁrst language so far discussed with <i>any</i> builtin support
+for Unicode named characters, <i>e.g.,</i> <code>\N{GREEK SMALL LETTER FINAL SIGMA}</code>
+for U+03C2, <i>ς</i>.  
+
+</li><li level="1">This is good because it frees you from magic numbers without making
+you use Unicode literals that might be lookalikey, <i>e.g.,</i> 
+<code>\N{GREEK SMALL LETTER STIGMA}</code> for U+03DB, <i>ϛ</i>.     
+
+</li><li level="1">However, it does not support 
+the named sequences described by Unicode v5,
+like <code>\N{LATIN CAPITAL LETTER A WITH MACRON AND GRAVE}</code>.  
+
+</li><li level="1">Admittedly, this is a comparitively
+new feature that probably hasn’t yet seen a lot of demand.  
+Perl <i>does</i> support them, however:
+
+<font size="5">
+
+<pre> % perl5.14.0 -Mcharnames=:full -le 'print("\N{LATIN CAPITAL LETTER A WITH MACRON AND GRAVE}")'
+ Ā̀
+
+ % perl5.14.0 -Mcharnames=:full -le 'print("\N{LATIN CAPITAL LETTER A WITH MACRON AND GRAVE}")' | uniquote -v
+ \N{LATIN CAPITAL LETTER A WITH MACRON}\N{COMBINING GRAVE ACCENT} </pre></font>
+
+</div>
+<div class="slide">
+<h1>Python: Not Good News
+
+</h1><ul><li level="1">Unicode in Python v2.7 is way Murphian; 
+use v3.2 and your Unicode life will be... well, less troubled.  
+
+</li><li level="1">Python has no support for graphemes clusters, without which it 
+is virtually impossible to correctly process Unicode text.
+
+</li><li level="1">Python does not include a standard module for Unicode collation.  
+
+</li><li level="1">Python’s standard <code>re</code> library is really quite deﬁcient from 
+a Unicode perspective.  
+
+</li><li level="1">However, if you
+use <code>re.U</code>, then your <code>\w</code>, <code>\d</code>, <i>&c</i> actually <i>do</i> work according to UTS#18.
+Mostly.  
+
+</div>
+<div class="slide">
+<h1>Python Regexes: The Bad News
+
+</h1><ul><li level="1">The Python <code>re</code> library doesn’t oﬀer <i>any</i> Unicode properties. 
+
+</li><li level="1">It doesn’t understand graphemes. 
+
+</li><li level="1">It doesn’t do casefolding.  <i>At all!</i> Not simple, and not full.    
+
+</li><li level="1">Rather,  it mistakenly applies case<i>mapping</i> instead of case<i>folding</i>, 
+and therefore sometimes gets the wrong answer, failing to match such things as:
+
+<ul><li level="1">The U+00BC <i>µ</i> micro sign and either Greek mu, whether <i>μ</i> or <i>Μ</i>.
+
+</li><li level="1">U+0175, <code>LATIN SMALL LETTER LONG S</code> <i>ſ</i> (as in the old‐style <i>poſt</i>) and either of 
+the regular versions, whether <i>S</i> or <i>s</i>.
+
+</li><li level="1">The regular Greek lowercase sigma, <i>σ</i>, whether
+the ﬁnal sigma, <i>ς</i>,
+or the uppercase one, <i>Σ</i>.
+
+</li><li level="1">The Greek “iota subscript”, 
+<code>COMBINING GREEK YPOGEGRAMMENI</code>, ◌ͅ , and any other iota like 
+<code>GREEK CAPITAL LETTER IOTA</code> <i>Ι</i>,
+<code>GREEK SMALL LETTER IOTA</code> <i>ι</i>, or
+<code>GREEK PROSGEGRAMMENI</code> <i>ι</i>.
+
+</li></ul></div>
+<div class="slide">
+<h1>Python Regexes: The Good News
+
+</h1><ul><li level="1">Matthew Barnett has a <i>very</i> interesting replacement library for the
+lame <code>re</code> module Python comes with, for both v2 and v3.   
+
+</li><li level="1">It not only handles Unicode better (read: <i>at all</i>),
+it has lots of other super‐neat features found in no other regex library anywhere.  
+
+</li><li level="1">It supports Unicode graphemes, boundaries,
+<i>does</i> do (simple) casefolding, doesn’t require a Unicode ﬂag for 
+Unicode charclasses, <i>&c</i>.
+
+</li><li level="1">Property support goes <i>far</i>
+beyond RL1.2’s required 11, with 67 properties supported as of this writing.
+This makes a huge diﬀerence in real processing.
+
+<pre>  http://pypi.python.org/pypi/regex </pre></li></ul></div>
+<div class="slide">
+<h1>Python: The Ugly Bits
+
+</h1><ul><li level="1">Python uses the antiquated and broken UCS‐2 — <i>er,</i> except when it uses UCS‐4.
+This is a <i>super‐massive</i> problem.   💀
+
+</li><li level="1">Because you <i>cannot count on having a wide build</i> so
+you can have UCS‐4, you cannot reliably use Python on general Unicode such
+as the corpus I showed earlier.  
+
+</li><li level="1">Python plays naughty guessing games with encodings, causing programs to
+act diﬀerently when redirected. 
+
+</li><li level="1">Although you <i>can</i> have a variable named <code>écran</code> or
+<code>el_niño</code>,  or even
+<code>東京</code> or <code>文字化け</code>,
+the UCS‐2 Curse prevents having one named <code>𝔘𝔫𝔦𝔠𝔬𝔡𝔢</code>, let alone
+<code>𐐔𐐯𐑅𐐨𐑉𐐯𐐻</code> or 
+
+<code><font face="Monaco,  'Courier', 'Courier New', Mono">𐌰𐍄𐍄𐌰‿𐌿𐌽𐍃𐌰𐍂‿𐌸𐌿‿𐌹𐌽‿𐌷𐌹𐌼𐌹𐌽𐌰𐌼</font></code>. (This has just been fixed [2011-08-11])
+
+</li><li level="1"><code>Atta_unsar_</code> <code>þu_in_himinam</code> is ok, though.  
+
+</li></ul></div>
+<div class="slide">
+<h1>Testing for  UCS‐2 <i>vs</i> UCS‐4 
+
+</h1><ul><li level="1">As with Javascript, you cannot rely on all Python interpreters 
+using one or another internal representation.
+
+</li><li level="1">However, here again you can determine which you have on 
+any given system.  
+
+<pre> import sys
+ wide_enough = (sys.maxunicode >= 0x10FFFF)
+ print("my largest character is",  sys.maxunicode) </pre></li><li level="1">On a wide build, <code>sys.maxunicode</code> is 0x10FFFF, 
+whereas it is otherwise only 0xFFFF.
+
+</li><li level="1">That way you can abort unless you’re on a wide build.
+
+<pre> if not wide_enough:
+     raise Exception("Narrow build lacks full Unicode support") </pre></div>
+<div class="slide">
+<h1>Fixing Python Redirection Troubles
+
+</h1><ul><li level="1">You <i>can</i> set the <code>PYTHONIOENCODING</code> environment variable so it stops guessing.
+(This is like setting <code>PERL_UNICODE</code> to <code>S</code>.)
+
+<pre> $ export PYTHONIOENCODING=utf8 </pre></li><li level="1">By default, <code>stdin</code> and <code>stdout</code> encoding errors raise exceptions,
+but those on <code>stderr</code> do not.
+
+</li><li level="1">To override all reliance on guessing or your environment, your program can do 
+something like this (in Python v3):
+
+<pre> import io
+ import sys
+ for s in ("stdin","stdout","stderr"):
+     setattr(sys, s, io.TextIOWrapper(getattr(sys, s).detach(), encoding="utf8")) </pre></li><li level="1">I can’t actually syntax‐check that previous block by doing a
+<code>{!}python</code> from within <i>vi</i> on the pod source, darn it!!
+
+</li></ul></div>
+<div class="slide">
+<h1>Python: A Complete Solution?
+
+</h1><p>Even 🐍ᵛ³ + <code>regex</code>  cannot ﬁx all 🐍ᵛ²  Unicode problems, because 🐍’s
+character model is inherently broken.  It completely violates UTS#18’s 
+Level 1 requirement for regular expressions — the <i>minimal</i> level for useful Unicode support —
+that the engine support Unicode characters as <b>basic logical units <i>independent of serialization</i> like UTF‑*</b>:
+
+</p><font size="4">
+
+<pre> % python3.2
+ Python 3.2 (r32:88445, Jul 21 2011, 14:44:19)
+ [GCC 4.2.1 (Apple Inc. build 5664)] on darwin
+ Type "help", "copyright", "credits" or "license" for more information.
+ >>> import re
+ >>> g = "\N{GREEK SMALL LETTER ALPHA WITH VARIA AND YPOGEGRAMMENI}"
+ >>> print(g)
+ᾲ
+ >>> print(re.search(r'\w', g))
+ &lt;_sre.SRE_Match object at 0x10051f988>
+ >>> p = "\N{MATHEMATICAL SCRIPT CAPITAL P}"
+ >>> print(p)
+𝒫
+ >>> print(re.search(r'\w', p))
+None
+ >>> print(re.search(r'..', p))   # ← 𝙏𝙃𝙄𝙎 𝙄𝙎 𝙏𝙃𝙀 𝙑𝙄𝙊𝙇𝘼𝙏𝙄𝙊𝙉 𝙍𝙄𝙂𝙃𝙏 𝙃𝙀𝙍𝙀 
+&lt;_sre.SRE_Match object at 0x10051f988>
+ >>> print(len(chr(0x1D4AB)))
+2 </pre></font>
+
+</div>
+<div class="slide">
+<h1>Java
+
+</h1><ul><li level="1">Java’s Unicode support has a lot to be said about it, most of which wouldn’t
+pass muster with the potty-mouth police.    🔞  
+
+</li><li level="1">It’s still a whole lot better than Python, though, because Java <i>demonstrably 
+cares</i> about conformance with The Unicode Standard.
+
+</li><li level="1">Then again, Oracle pays people to work on the Java core, despite the OpenJDK.
+Few other languages (apart perhaps from Google’s Go) enjoy such support.
+
+</div>
+<div class="slide">
+<h1>Java: The Ugly News
+
+</h1><ul><li level="1">Although it has several, Java’s <i>biggest</i> Unicode problem is that
+you cannot store a character in a <code>char</code>,
+nor in a <code>Character</code> for that matter.  🚽
+
+</li><li level="1">You have to use an <code>int</code> or a <code>String</code>:  👉  <i>“int is the new char.”</i> 
+
+</li><li level="1">Functions that deal
+with <code>char</code>s <b><i>do not</i> deal with Unicode characters</b>:  <code>String.length</code>
+must be replaced by <code>codePointCount</code>, <code>charAt</code> by <code>codePointAt</code>, <i>&c</i>.
+
+</li><li level="1">Many classes simply have no “code point” (<i>i.e.,</i> Unicode character) interfaces at all.
+
+</li><li level="1">This is all extremely error‐prone and unpleasant — <i>at best</i>.  
+
+</li></ul></div>
+<div class="slide">
+<h1>Java: The Bad and Half‐bad
+
+</h1><ul><li level="1">No support for graphemes or other standard Unicode algorithms
+like collation and linebreaking.  
+
+</li><li level="1">No support for named characters like <code>\N{PILE OF POO}</code>, so
+you have to put all these magic numbers in your code.  But <i>which</i>
+magic numbers?  It’s a 💩  situation.
+
+</li><li level="1">Encoding errors are silently ignored unless you work really hard.
+
+</li><li level="1">On the other hand, Java <i>does</i> support full case<b>mapping</b>, even though it
+supports only simple case<b>folding</b>.  
+
+</li></ul></div>
+<div class="slide">
+<h1>Java Tips
+
+</h1><ul><li level="1"><b>Avoid the Java preprocessor!</b>  I’m talking about things like <code>\u<i>XXXX</i></code>.
+
+</li><li level="1">Java has no way of indicating the encoding of a source unit interior to that
+ﬁle itself.  You have to put it on the command line:
+
+<pre> % javac -encoding UTF-8 SomeanNoyinGanDillegiBlenAme.java </pre></li><li level="1">The “default” encoding if unspeciﬁed varies from one platform to the next, 
+so if you do not specify it exclicitly, even on <code>std{in,out,err}</code>, 
+<i><b>your code is not portable</b></i>.  
+
+</li><li level="1">No exceptions, either, so it’s <i><b>not</b></i> just
+<i>“write‐once & run‐nowhere”</i>.  Instead, 
+<i>?it?s write?once <i>&</i> run?nowhere?</i>. Have a nice day.
+
+</li><li level="1">Sometimes you can put a band‐aid around that problem at runtime this way:
+
+<pre> % java -Dfile.encoding=UTF-8 SomeanNoyinGanDillegiBlenAme </pre></li></ul></div>
+<div class="slide">
+<h1>More Java Tips
+
+</h1><ul><li level="1">The constructors for bridging bytes to characters all come in four forms.
+
+<pre> InputStreamReader(InputStream in)
+ InputStreamReader(InputStream in, Charset cs)
+ InputStreamReader(InputStream in, CharsetDecoder dec)
+ InputStreamReader(InputStream in, String charsetName)
+
+ OutputStreamWriter(OutputStream out)
+ OutputStreamWriter(OutputStream out, Charset cs)
+ OutputStreamWriter(OutputStream out, CharsetEncoder enc)
+ OutputStreamWriter(OutputStream out, String charsetName) </pre></li><li level="1">Only one constructor out of each set of those four is usable, because
+the others hide errors from you.  
+
+</li><li level="1">Do <i>you</i> know which is the only safe <i>&</i> sane one?  
+
+</div>
+<div class="slide">
+<h1>Java Safe Streaming
+
+</h1><p>Here’s an <code>open3</code> type procedure for Java, with correct constructors:
+
+</p><font size=2>
+
+<pre>    Process
+    slave_process = Runtime.getRuntime().exec("perl -CS script args");
+
+ OutputStream
+ __bytes_into_his_stdin  = slave_process.getOutputStream();
+
+ OutputStreamWriter
+   chars_into_his_stdin  = new OutputStreamWriter(
+                             __bytes_into_his_stdin,
+         /* DO NOT OMIT! */  Charset.forName("UTF-8").newEncoder()
+                         );
+
+ InputStream
+ __bytes_from_his_stdout = slave_process.getInputStream();
+
+ InputStreamReader
+   chars_from_his_stdout = new InputStreamReader(
+                             __bytes_from_his_stdout,
+         /* DO NOT OMIT! */  Charset.forName("UTF-8").newDecoder()
+                         );
+
+ InputStream
+ __bytes_from_his_stderr = slave_process.getErrorStream();
+
+ InputStreamReader
+   chars_from_his_stderr = new InputStreamReader(
+                             __bytes_from_his_stderr,
+         /* DO NOT OMIT! */  Charset.forName("UTF-8").newDecoder()
+                         ); </pre></font>
+
+</div>
+<div class="slide">
+<h1>Java Regexes: (Finally) Some Good News
+
+</h1><ul><li level="1">Prior to JDK7, I would <i>not</i> recommend attempting to use the Java
+<code>Pattern</code> class for regexes, and would embellish any uses of <code>Character</code> and
+<code>String</code> with strong provisos.
+
+</li><li level="1">However, JDK7 goes a <i>seriously</i> long way toward changing that.  😇  
+
+</li><li level="1">By bringing Java into compliance with all of UTS#18’s Level 1 requirements
+for the very most basic of Unicode regex handling, you can <i>ﬁnally</i> do 
+basic Unicode regex handling per UTS#18.
+
+</li><li level="1">Java v1.7 is the ﬁrst language so far discussed
+for which this is true.
+
+</li></ul></div>
+<div class="slide">
+<h1>Java Regexes: Still a Ways to Go
+
+</h1><ul><li level="1">However, I’d <i>still</i> JNI into ICU’s regex library to do serious Unicode
+regex work — if I had to do it in Java.   
+
+</li><li level="1">That’s because you truly do need RL2.2’s 
+grapheme support and RL2.7’s full property support for <i>real</i> Unicode work.  
+
+</li><li level="1">That’s why this is what Google does on Android.  
+
+</li><li level="1">The Android JNI wrappers are open source.  Look for the ﬁle
+<code>NativeRegEx.cpp</code> in the public Android repository.
+
+</li></ul></div>
+<div class="slide">
+<h1>The JDK7 Regex Revolution
+
+</h1><ul><li level="1">As of v1.7, Java supports Unicode v6.0.0, with many classes ﬁxed.  
+
+</li><li level="1">The new <code>\x{<i>XXXXXX</i>}</code> regex escape gets around The UTF‐16 Curse.
+The previously broken <code>[𝒜‑𝒵]</code> can now be written <code>[\x{1D49C}‑\x{1D4B5}]</code>.  
+
+</li><li level="1">The new <code>UNICODE_CHARACTER_CLASSES</code> compilation ﬂag changes the
+charclass abbreviations like <code>\w</code> <i>&c</i>, and also the POSIX ones like
+<code>\p{alpha}</code>, to make them do what UTS#18 says they’re <i>supposed</i> to do.  
+
+</li><li level="1">There’s a new <code>"(?U)"</code> ﬂag embeddable in the pattern to do the same
+thing.
+
+</li></ul></div>
+<div class="slide">
+<h1>JDK7: And That’s Not All
+
+</h1><ul><li level="1">Casing tests and conversions now work on all applicable
+code points.  
+
+<ul><li level="1">Oops, spoke too soon: Because <code>String.equalsIgnoreCase()</code> still erroneously
+treats strings as UCS‐2 sequences not as UTF‐16, it fails to notice that
+<i>𐐔𐐇𐐝𐐀𐐡𐐇𐐓</i> and <i>𐐼𐐯𐑅𐐨𐑉𐐯𐐻</i> are the same.  Use ICU’s <code>CaseInsenitiveString.equals()</code>
+instead for correct behavior.
+
+</li></ul></li><li level="1"><i><b>All</b></i> missing properties from UTS18’s RL1.2 <b>eleven mandatory ones</b> have 
+been added, including especially <code>\p{script=<i>SCRIPTNAME</i>}</code>,  
+also usable as <code>\p{is<i>SCRIPTNAME</i>}</code> or <code>\p{<i>SCRIPTNAME</i>}</code>.
+
+</li><li level="1">Before they worked only on letters alone, not on <code>Other_Alphabetic</code>.  
+
+</li></ul></div>
+<div class="slide">
+<h1>Perl Unicode Gotchas
+
+</h1><ul><li level="1">I’ve already given something like four hours of talks this week on Unicode 
+in Perl.  Since we’re already over our time limit, I’ll mostly refer 
+you to those materials. 
+
+</li><li level="1">You <i>may</i> wish to set your <code>PERL_UNICODE</code> envariable to <code>"SA"</code>, or
+in certain <i>very</i> limited <i>&</i> one‐shot cases, even to <code>"SAD"</code>.
+
+</li><li level="1">The short story is that you will spare yourself a great deal of pain and 
+suﬀering  if you start every Perl  program this way: 
+
+<pre> use v5.14;   # many, 𝘮𝘢𝘯𝘺 Unicode fixes
+ use utf8;    # so source code is UTF-8
+ use strict;
+ use warnings;
+
+ use autodie; ## 𝘽𝙐𝙂! conflicts with 𝘶𝘴𝘦 𝘰𝘱𝘦𝘯 below!!
+
+ use charnames qw&lt; :full >;     # standard \N{charnames}
+
+ use open qw&lt; :std :encoding(UTF-8) >;  # default streams </pre></li></ul></div>
+<div class="slide">
+<h1>Perl Unicode Specialties
+
+</h1><ul><li level="1">Perl meets RL2.7 by supporting <i>all</i> standard Unicode properties, including
+all name and value aliases.  But Perl goes further: it even lets you create your very own customized properties.  
+
+</li><li level="1">Same story with <code>\N{<i>NAMED CHARACTER</i>}</code>: 
+you can create your own customized versions of those, too.  I use this all the time.
+
+</li><li level="1">Not only does Perl <i>not</i> restrict your code points to 16 bits, it 
+doesn’t even restrict them to Unicode’s own 21 bits.  If you can’t think of
+something to do with 72 bits of characters, I know people who can.  
+
+</li><li level="1">Perl’s <b>standard</b> module implementing the Unicode Collation Algorithm — part of 
+every distribution since v5.7 and now as of v5.14 with locale support, too —
+makes it especially easy to create customized sorts, run 
+<b><i>accent‐insensitive</i> string comparisons and searches</b>,
+and much more.  I use this nearly every day.
+
+</li></ul></div>
+<div class="slide">
+<h1>🏁 And Our Winner Is...
+
+</h1><ul><li level="1">Look back at the two charts of feature summaries on slides 7 <i>&</i> 8. 
+We knew where we were going right from the start: 💪  <b>Perl still wins this round.</b>
+
+</li><li level="1">Even though 🐪  oﬀers the most complete Unicode support of all these 
+languages, that doesn’t mean it’s without its bumps:
+there’s still plenty of work to be done.
+
+</li><li level="1">No matter what language you use, everyone needs to learn basic things about
+Unicode, and perhaps <i>unlearn</i> some basic things, too: myths
+such as Unicode is “like ASCII but with more characters” or that it’s “just for non‐English”.
+
+</li><li level="1">If 🐪  isn’t your favorite language, this is a great opportunity
+for  ambitious and enterprising 🐣  programmers to bring  🐍 💎 ☕
+up to speed at ((more) fully) supporting The Unicode Standard.
+
+</li><li level="1">Perl avoided certain Unicode mistakes other languages
+made (like Java, for one) by learning from others’ mistakes; maybe you can see 
+things Perl has done wrong with Unicode and similarly improve your own language. 👓 
+
+</div>
+<div class="slide">
+<h1>Good Luck 🍀   and Good Night 🌃 
+
+</h1><ul><li level="1">Even if you don’t use Perl, the score or so of  Unicode tools
+I wrote that are in the <code>Unicode::Tussle</code> bundle from CPAN will really make 
+your Unicode life a lot easier.  
+
+<pre> http://search.cpan.org/perldoc?Unicode::Tussle
+
+ % sudo perl -MCPAN -e 'install Unicode::Tussle' </pre></li><li level="1">Brief demos of these tools are included in my other conference materials, 
+plus many more such are included with the module documentation.
+
+</li><li level="1">Thanks very much to Brian Foy for putting that CPAN bundle together for me, 
+and for getting me to give this talk in the ﬁrst place.  👏  
+
+<center>
+        <font size="+5">
+<p>
+𝔢𝔵𝔢𝔲𝔫𝔱 𝔬𝔪𝔫𝔢𝔰
+<p>
+🍸  
+</font>
+</center>
+
+</li></ul></div>
+<div class="slide">
+<h1>Appendix 1: Font suggestions
+
+</h1><ul><li>
+I recommend 
+two free fonts from George
+Douros at
+<A HREF="http://users.teilar.gr/~g1951d/">
+users.teilar.gr/~g1951d/</a> 
+known to work with this presentation: his <i>Al&#64257;os</i> font for regular
+text, and his <i>Symbola</i> font for fancy emoji.
+If any of these don&#8217;t look right to you, you probably need to 
+supplement your system fonts:
+<ul>
+
+<li>Ligatures: 
+    <font face="'Arno Pro', Alfios,  Pali, Serif">
+        &#64257; &#64259; &#64256; &#64260; &#64258; &#946; &#7838; &#64261;  &#64262; 
+    </font>
+
+<li>Math letters: 
+    <font face="Symbola, Serif">
+        &#119964; &#119967; &#120069; &#120078; &#120124; &#120125; 
+    </font>
+
+<li>Gothic <i>&</i> Deseret: 
+    <font face="Symbola, Serif">
+&#66360;&#66364;&#66365;&#66370;, &#66580;&#66607;&#66629;&#66600;&#66633;&#66607;&#66619;
+    </font>
+
+<li>Symbols: 
+    <font face="Symbola, Sans">
+        &#10004; &#9989; &#128042; &#128214; &#128706; &#128013; 
+    </font>
+
+<li>Emoticons: 
+    <font face="Symbola, Sans">
+        &#128519; &#128520; &#128521; &#128552; &#128557; &#128561; 
+    </font>
+
+<li>Upside&#8208;down:
+    <font size=2 face="Monaco, Mono">
+        &#161;p&#592;&#601;&#613; &#633;no&#654; uo &#387;u&#7433;pu&#592;&#647;s &#654;q s&#7433;&#613;&#647; p&#592;&#601;&#7450;
+    </font>
+
+<li>Combining characters: 
+
+
+    <font face="Monaco, 'Everson Mono', Mono">
+&#9676;&#770;,&#9676;&#771;,&#9676;&#8414;,&#9676;&#818;,&#9676;&#65024;,&#9676;&#821;,&#9676;&#823;
+    </font>
+
+</ul>
+<li>The last line with combining characters is especially hard to get to
+look right.  You may &#64257;nd that the shareware font <i>Everson Mono</i>
+works when all else fails.
+
+</ul>
+
+</div>
+<div class="slide">
+<h1>Appendix 2: Tools
+
+</h1><ul>
+<li>
+I wrote a huge bucketful of tools to make your life with Unicode not just easier, but more fun.
+<li>These are available in 
+the <a href="http://search.cpan.org/perldoc?Unicode::Tussle" target=_blank>Unicode::Tussle</a> bundle from CPAN,
+where they come with <a href="http://search.cpan.org/perldoc?Unicode::Tussle" target=_blank>documentation</a>,
+or you can get them individually 
+from <a href="http://training.perl.com/scripts/" target=_blank>training.perl.com/scripts</a> if you&#8217;d prefer.
+
+<li>
+Thanks very much to <i>brian d foy</i> for putting that CPAN bundle together for me.
+</ul>
+
+</div>
+<div class="slide">
+<h1>Contact Information
+
+</h1><ul>
+<li>
+I’m Tom Christiansen.  You can reach me at <A HREF="mailto:tchrist@perl.com">tchrist@perl.com</a>.
+<li>
+All three talks, as well as these instructions, are available from 
+<a  href="http://training.perl.com/OSCON2011/index.html">
+training.perl.com/OSCON2011</a>.
+</ul>
+
+</li></ul></li></ul></li></ul></li></ul></li></ul></li></ul></li></ul></li></ul></li></ul></li></ul></div></body></html>
+
+
+
+
+<!--
+     FILE ARCHIVED ON 8:13:32 Dec 24, 2012 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 0:40:39 Nov 25, 2015.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+-->

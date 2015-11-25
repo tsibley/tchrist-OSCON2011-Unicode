@@ -1,0 +1,20 @@
+
+
+
+
+
+/*
+     FILE ARCHIVED ON 2:08:00 Jul 20, 2013 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 0:28:32 Nov 25, 2015.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+*/
+/* DO NOT CHANGE THESE unless you really want to break Opera Show */
+.slide {
+	visibility: visible !important;
+	position: static !important;
+	page-break-before: always;
+}
+#slide0 {page-break-before: avoid;}
